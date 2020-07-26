@@ -59,7 +59,7 @@ def histogram_match(source, reference, match_proportion=1.0):
     return target.reshape(orig_shape)
 
 
-IMG_FOLDER = '../images/'  # folder of the form ./IMGS_PREPROCESSED/abudhabi/imgs_1/..(13 tif 2D images of sentinel channels)..
+IMG_PATH = '/datasets/extra_space2/rpartsey/related_works/onera/images_preprocessed'  # folder of the form ./IMGS_PREPROCESSED/abudhabi/imgs_1/..(13 tif 2D images of sentinel channels)..
 #           ./IMGS_PREPROCESSED/abudhabi/imgs_2/..(13 tif 2D images of sentinel channels)..
 #           ....
 #           ./IMGS_PREPROCESSED/abudhabi/imgs_n/..(13 tif 2D images of sentinel channels)..
@@ -73,22 +73,22 @@ all_areas = ['abudhabi', 'aguasclaras', 'beihai', 'beirut', 'bercy', 'bordeaux',
              'cupertino', 'dubai', 'hongkong', 'lasvegas', 'milano', 'montpellier', 'mumbai', 'nantes',
              'norcia', 'paris', 'pisa', 'rennes', 'rio', 'saclay_e', 'saclay_w', 'valencia']
 
-DESTINATION_FOLDER = 'IMGS_PREPROCESSED'
-os.mkdir('./' + DESTINATION_FOLDER)
+DESTINATION_PATH = '/datasets/extra_space2/rpartsey/related_works/onera/images_processed'
+# os.mkdir(DESTINATION_PATH)
 
 for i_path in all_areas:
     print(i_path)
 
     date_folders = []
     for nd in nb_dates:
-        date_folders.append(list(glob.glob(os.path.join(IMG_FOLDER + i_path + '/imgs_{}/*.tif'.format(str(nd))))))
+        date_folders.append(list(glob.glob(os.path.join(IMG_PATH, i_path, f'imgs_{nd}', '*.tif'))))
 
     # B02 channel has the same dimensions with the groundtruth for the labeled images.
     # So we keep it to reshape the rest of the channels for both labeled images and nonlabeled images
     gts = [s for s in date_folders[0] if 'B02' in s]
     gts = io.imread(gts[0])
 
-    os.mkdir('./' + DESTINATION_FOLDER + '/' + i_path + '/')
+    os.mkdir(os.path.join(DESTINATION_PATH, i_path))
 
     for nd in nb_dates:
         print('date', nd)
@@ -118,4 +118,4 @@ for i_path in all_areas:
         im_merge = np.stack(imgs, axis=2)
         im_merge = np.asarray(im_merge)
         im_merge = np.reshape(im_merge, (im_merge.shape[0], im_merge.shape[1], im_merge.shape[2]))
-        np.save('./' + DESTINATION_FOLDER + '/' + i_path + '/' + i_path + '_{}.npy'.format(str(nd)), im_merge)
+        np.save(os.path.join(DESTINATION_PATH, i_path, f'{i_path}_{nd}.npy'), im_merge)
